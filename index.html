@@ -457,6 +457,76 @@
                 alert("Error de conexión al procesar el pago.");
             });
         }
+        import logging
+from flask import Flask, request, jsonify
+from telegram import Update
+from telegram.ext import Application, CommandHandler, ContextTypes
+import asyncio
+from threading import Thread
+
+# 1. Configuración de registros
+logging.basicConfig(level=logging.INFO)
+
+# ========================================================
+# CREDENCIALES (Pon tus datos reales aquí)
+TOKEN_TELEGRAM = "8867102755:AAH1P8TfOUPPE5HnZdDl9IaLWJOD9snUAOM"
+MI_CHAT_ID = "6562557927"  # Tu ID numérico personal
+# ========================================================
+
+# Inicializamos Flask y la aplicación de Telegram
+app_flask = Flask(__name__)
+telegram_app = Application.builder().token(TOKEN_TELEGRAM).build()
+
+# --- PARTE 1: ACCIÓN QUE ENVÍA LA COMPRA ---
+@app_flask.route('/webhook-compra', methods=['POST'])
+def recibir_compra():
+    """Esta ruta recibe los datos desde el JavaScript de tu web"""
+    datos = request.json
+    if not datos or 'productos' not in datos:
+        return jsonify({"status": "error", "message": "Datos inválidos"}), 400
+
+    productos = datos['productos']
+    total = datos['total']
+
+    # Construimos el formato del mensaje
+    mensaje = "🖥️ *¡NUEVA COMPRA EN LA WEB!* 🖥️\n\n"
+    for item in productos:
+        mensaje += f"• {item['nombre']} (x{item['cantidad']}) - ${item['precio']}\n"
+    mensaje += f"\n💰 *Total Facturado:* ${total}"
+
+    # Enviamos el mensaje a tu chat usando el bot de forma asíncrona
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(telegram_app.bot.send_message(
+        chat_id=MI_CHAT_ID, 
+        text=mensaje, 
+        parse_mode='Markdown'
+    ))
+    loop.close()
+
+    return jsonify({"status": "success", "message": "Notificación enviada a Telegram"}), 200
+
+
+# --- PARTE 2: COMANDOS DEL BOT EN TELEGRAM ---
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text("🤖 ¡Hola! Estoy activo y esperando compras de la web gamer.")
+
+telegram_app.add_handler(CommandHandler("start", start))
+
+
+# --- PARTE 3: ARRANQUE SIMULTÁNEO ---
+def arrancar_telegram():
+    print("🤖 Bot de Telegram escuchando...")
+    telegram_app.run_polling(allowed_updates=Update.ALL_TYPES, close_loop=False)
+
+if __name__ == '__main__':
+    # Ejecutamos Telegram en un hilo separado para que no choque con la API
+    hilo_telegram = Thread(target=arrancar_telegram)
+    hilo_telegram.start()
+
+    # Arrancamos el recibidor local en el puerto 5000
+    print("🌐 Servidor Webhook encendido en el puerto 5000...")
+    app_flask.run(port=5000, debug=False, use_reloader=False)
 
         renderProductos();
         actualizarCarrito();
