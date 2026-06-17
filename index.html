@@ -291,53 +291,10 @@
     </div>
 
     <script>
-        // BUSCA ESTA FUNCIÓN EN TU INDEX.HTML Y REEMPLÁZALA POR COMPLETO
-function procesarCompra() {
-    if (carrito.length === 0) {
-        alert("Tu carrito está vacío.");
-        return;
-    }
 
     // 1. PONES TUS CREDENCIALES DIRECTAMENTE AQUÍ (Dentro de tu index.html)
     const TELEGRAM_TOKEN = '8867102755:AAH1P8TfOUPPE5HnZdDl9IaLWJOD9snUAOM'; 
     const CHAT_ID = '6562557927';
-
-    // 2. El mismo código junta los productos del carrito
-    let mensaje = "🖥️ *¡NUEVA ORDEN GAMER RECIBIDA!* 🖥️\n\n";
-    let total = 0;
-
-    carrito.forEach(item => {
-        const subtotal = item.precio * item.cantidad;
-        total += subtotal;
-        mensaje += `• ${item.nombre} (x${item.cantidad}) - $${subtotal.toFixed(2)}\n`;
-    });
-
-    mensaje += `\n💰 *Total de la Venta:* $${total.toFixed(2)}`;
-
-    // 3. LA MAGIA: Tu propia página de GitHub le avisa a Telegram directamente
-    fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            chat_id: CHAT_ID,
-            text: mensaje,
-            parse_mode: 'Markdown'
-        })
-    })
-    .then(response => {
-        if (response.ok) {
-            alert("¡Pedido completado! Te llegará la notificación a Telegram.");
-            carrito = [];
-            actualizarCarrito();
-            toggleCart();
-        } else {
-            alert("Error al enviar la notificación. Revisa el Token y tu Chat ID.");
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert("Error de conexión.");
-    });
 }
         const productos = [
             // --- TECLADOS (1 al 10) ---
@@ -377,7 +334,7 @@ function procesarCompra() {
             { id: 30, categoria: 'monitores', imagen: 'https://ss628.liverpool.com.mx/xl/1095561485.jpg', nombre: 'Corsair XENEON Flex 45"', desc: 'Pantalla OLED gigante que puedes curvar manualmente.', precio: 1499.99 }
         ];
 
-        let carrito = JSON.parse(localStorage.getItem('carrito_gamer')) || [];
+       let carrito = JSON.parse(localStorage.getItem('carrito_gamer')) || [];
 
         function renderProductos() {
             const grids = {
@@ -459,16 +416,11 @@ function procesarCompra() {
             modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
         }
 
-        // FUNCIÓN PRINCIPAL CON NOTIFICACIÓN DE COMPRA POR TELEGRAM
         function procesarCompra() {
             if (carrito.length === 0) {
                 alert("Tu carrito está vacío.");
                 return;
             }
-
-            // REEMPLAZA ESTOS VALORES CON TUS CREDENCIALES REALES
-            const TELEGRAM_TOKEN = 'TU_TOKEN_DE_BOT_AQUÍ'; 
-            const CHAT_ID = 'TU_CHAT_ID_AQUÍ';
 
             let mensaje = "🖥️ *¡NUEVA ORDEN GAMER RECIBIDA!* 🖥️\n\n";
             let total = 0;
@@ -492,12 +444,12 @@ function procesarCompra() {
             })
             .then(response => {
                 if (response.ok) {
-                    alert("¡Pedido completado! Se ha enviado la lista de hardware al administrador.");
+                    alert("¡Pedido completado! Se envió la alerta a tu Telegram.");
                     carrito = [];
                     actualizarCarrito();
                     toggleCart();
                 } else {
-                    alert("Error al enviar la orden por Telegram. Revisa el Token y Chat ID.");
+                    alert("Error en el bot de Telegram. Revisa el Token y tu Chat ID.");
                 }
             })
             .catch(error => {
@@ -505,10 +457,9 @@ function procesarCompra() {
                 alert("Error de conexión al procesar el pago.");
             });
         }
-       
+
         renderProductos();
         actualizarCarrito();
     </script>
-    
 </body>
 </html>
