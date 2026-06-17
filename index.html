@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gamer Tech Store</title>
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --card-bg: #151a26;
+            --text-color: #ffffff;
+            --accent-color: #00f0ff; /* Azul neón gamer */
+            --accent-hover: #00b8cc;
+            --telegram-color: #0088cc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .cart-icon-container {
+            cursor: pointer;
+            background: var(--accent-color);
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .cart-icon-container:hover {
+            background: var(--accent-hover);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .section-title {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-top: 40px;
+            font-size: 28px;
+            text-transform: uppercase;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            border: 1px solid #222b3d;
+            transition: transform 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+        }
+
+        .product-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background-color: #000;
+        }
+
+        .product-info {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .product-title {
+            font-size: 18px;
+            margin: 0 0 10px 0;
+            font-weight: bold;
+        }
+
+        .product-desc {
+            font-size: 14px;
+            color: #a0aec0;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .product-price {
+            font-size: 18px;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .btn-add {
+            background-color: var(--accent-color);
+            color: #111;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-add:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* BOTÓN FLOTANTE DE TELEGRAM */
+        .telegram-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--telegram-color);
+            color: white;
+            text-decoration: none;
+            padding: 15px 22px;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+
+        .telegram-btn:hover {
+            transform: scale(1.08);
+            background-color: #0077b3;
+        }
+
+        .cart-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cart-content {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80%;
+            overflow-y: auto;
+            border: 1px solid var(--accent-color);
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #222b3d;
+            padding-bottom: 10px;
+        }
+
+        .close-cart {
+            cursor: pointer;
+            font-size: 24px;
+            color: #fff;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #222b3d;
+        }
+
+        .btn-remove {
+            background: #ff4d4d;
+            border: none;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .cart-total {
+            margin-top: 20px;
+            font-size: 20px;
+            text-align: right;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .btn-checkout {
+            display: block;
+            width: 100%;
+            background-color: var(--accent-color);
+            color: black;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Gamer Tech Store</div>
+        <div class="cart-icon-container" onclick="toggleCart()">
+            🛒 Carrito (<span id="cart-count">0</span>)
+        </div>
+    </header>
+
+    <a href="https://t.me/TU_USUARIO_DE_BOT" target="_blank" class="telegram-btn">
+        💬 Soporte Técnico
+    </a>
+
+    <div class="container">
+        <h2 class="section-title">Teclados Mecánicos Gamer</h2>
+        <div class="products-grid" id="teclados-grid"></div>
+
+        <h2 class="section-title">Ratones / Mouses Gamer</h2>
+        <div class="products-grid" id="ratones-grid"></div>
+
+        <h2 class="section-title">Monitores de Alta Tasa</h2>
+        <div class="products-grid" id="monitores-grid"></div>
+    </div>
+
+    <div class="cart-modal" id="cart-modal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h3>Tu Carrito Gamer</h3>
+                <span class="close-cart" onclick="toggleCart()">&times;</span>
+            </div>
+            <div id="cart-items-container"></div>
+            <div class="cart-total">Total: $<span id="cart-total-price">0.00</span></div>
+            <button class="btn-checkout" onclick="procesarCompra()">Confirmar Pedido</button>
+        </div>
+    </div>
+
+    <script>
+        const productos = [
+            // --- TECLADOS (1 al 10) ---
+            { id: 1, categoria: 'teclados', imagen: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&q=80', nombre: 'Logitech G Pro X', desc: 'Teclado mecánico TKL con switches intercambiables de nivel profesional.', precio: 129.99 },
+            { id: 2, categoria: 'teclados', imagen: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=400&q=80', nombre: 'Razer BlackWidow V4', desc: 'Switches verdes táctiles e iluminación Chrome RGB inmersiva.', precio: 169.99 },
+            { id: 3, categoria: 'teclados', imagen: 'https://images.unsplash.com/photo-1595225476474-87563907a212?w=400&q=80', nombre: 'Corsair K70 RGB PRO', desc: 'Estructura de aluminio duradera y tasa de sondeo de 8000Hz.', precio: 159.99 },
+            { id: 4, categoria: 'teclados', imagen: 'https://images.unsplash.com/photo-1626958390898-162d3577f593?w=400&q=80', nombre: 'SteelSeries Apex Pro', desc: 'Switches magnéticos ajustables Omnipoint para una respuesta récord.', precio: 199.99 },
+            { id: 5, categoria: 'teclados', imagen: 'https://images.unsplash.com/photo-1601445638532-3c6f6c3aa1d6?w=400&q=80', nombre: 'HyperX Alloy Origins', desc: 'Cuerpo compacto de aluminio completo y switches equilibrados HyperX.', precio: 89.99 },
+            { id: 6, categoria: 'teclados', imagen: 'https://images.unsplash.com/photo-1630959487405-b77da201bdcb?w=400&q=80', nombre: 'ASUS ROG Strix Scope', desc: 'Teclado óptico-mecánico con diseño optimizado para juegos FPS.', precio: 139.99 },
+            { id: 7, categoria: 'teclados', imagen: 'https://images.unsplash.com/photo-1614036417651-efe5912149d8?w=400&q=80', nombre: 'Keychron Q1 Pro', desc: 'Teclado mecánico custom inalámbrico con cuerpo de aluminio premium.', precio: 179.99 },
+            { id: 8, categoria: 'teclados', imagen: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400&q=80', nombre: 'Ducky One 3 Mini', desc: 'Formato 60% hot-swappable con teclas PBT de doble inyección.', precio: 119.99 },
+            { id: 9, categoria: 'teclados', imagen: 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=400&q=80', nombre: 'Redragon K552 Kumara', desc: 'El rey de la calidad-precio. Mecánico, robusto y retroiluminado.', precio: 45.00 },
+            { id: 10, categoria: 'teclados', imagen: 'https://images.unsplash.com/photo-1541140111813-8222e9d90981?w=400&q=80', nombre: 'Glorious GMMK 2', desc: 'Diseño modular de perfil bajo listo para personalizar al gusto.', precio: 109.99 },
+
+            // --- RATONES (11 al 20) ---
+            { id: 11, categoria: 'ratones', imagen: 'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=400&q=80', nombre: 'Logitech G502 X Plus', desc: 'Icono gamer renovado con switches híbridos y sensor HERO 25K.', precio: 149.99 },
+            { id: 12, categoria: 'ratones', imagen: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=400&q=80', nombre: 'Razer DeathAdder V3 Pro', desc: 'Diseño ergonómico ultraligero de 63 gramos para eSports.', precio: 139.99 },
+            { id: 13, categoria: 'ratones', imagen: 'https://images.unsplash.com/photo-1625842268584-8f3290455655?w=400&q=80', nombre: 'Logitech G Pro X Superlight 2', desc: 'El preferido de los profesionales, ligereza y precisión puras.', precio: 159.99 },
+            { id: 14, categoria: 'ratones', imagen: 'https://images.unsplash.com/photo-1613141411244-0e4ac259d217?w=400&q=80', nombre: 'SteelSeries Aerox 3 Wireless', desc: 'Diseño perforado resistente al agua y peso ultra bajo.', precio: 79.99 },
+            { id: 15, categoria: 'ratones', imagen: 'https://images.unsplash.com/photo-1683416565123-5e751f33f6b7?w=400&q=80', nombre: 'Razer Basilisk V3', desc: 'Rueda de desplazamiento inteligente e iluminación inferior.', precio: 69.99 },
+            { id: 16, categoria: 'ratones', imagen: 'https://images.unsplash.com/photo-1629429408209-1f912961dbd8?w=400&q=80', nombre: 'Corsair Dark Core RGB Pro', desc: 'Conectividad inalámbrica de baja latencia y carga Qi.', precio: 89.99 },
+            { id: 17, categoria: 'ratones', imagen: 'https://images.unsplash.com/photo-1600003014755-ba31aa59c4b6?w=400&q=80', nombre: 'Glorious Model O Wireless', desc: 'Carcasa de panal ambidiestra con deslizadores G-Skates.', precio: 85.00 },
+            { id: 18, categoria: 'ratones', imagen: 'https://images.unsplash.com/photo-131324155629-1a6edd1d1315?w=400&q=80', nombre: 'HyperX Pulsefire Haste', desc: 'Estructura ligera de panal con cable HyperFlex flexible.', precio: 49.99 },
+            { id: 19, categoria: 'ratones', imagen: 'https://images.unsplash.com/photo-1563299444-22a44d0554c6?w=400&q=80', nombre: 'ASUS ROG Gladius III', desc: 'Sensor de 19,000 DPI y zócalos para switches intercambiables.', precio: 99.99 },
+            { id: 20, categoria: 'ratones', imagen: 'https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=400&q=80', nombre: 'Redragon M711 Cobra', desc: 'Sensor óptico Pixart y diseño cómodo con 7 botones configurables.', precio: 25.00 },
+
+            // --- MONITORES (21 al 30) ---
+            { id: 21, categoria: 'monitores', imagen: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=400&q=80', nombre: 'ASUS ROG Swift 32"', desc: 'Pantalla 4K de 240Hz con tecnología OLED de respuesta inmediata.', precio: 899.99 },
+            { id: 22, categoria: 'monitores', imagen: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=400&q=80', nombre: 'Samsung Odyssey G7 27"', desc: 'Curvatura 1000R extrema con panel QLED a 240Hz.', precio: 549.99 },
+            { id: 23, categoria: 'monitores', imagen: 'https://images.unsplash.com/photo-1547119957-637f8679db1e?w=400&q=80', nombre: 'LG UltraGear 27" QHD', desc: 'Panel Nano IPS de 1ms G-Sync Compatible brillante.', precio: 349.99 },
+            { id: 24, categoria: 'monitores', imagen: 'https://images.unsplash.com/photo-1603481588273-2f908a9a7a1b?w=400&q=80', nombre: 'MSI Optix MAG274QRX', desc: 'Diseñado para eSports con refresco fluido de 240Hz QHD.', precio: 399.99 },
+            { id: 25, categoria: 'monitores', imagen: 'https://images.unsplash.com/photo-1551645121-d1034da75057?w=400&q=80', nombre: 'GIGABYTE M27Q 27"', desc: 'Primer monitor gamer con KVM integrado para dos PCs.', precio: 299.99 },
+            { id: 26, categoria: 'monitores', imagen: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80', nombre: 'BenQ ZOWIE XL2546K', desc: 'El estándar de los torneos de CS:GO y Valorant, 244Hz.', precio: 429.99 },
+            { id: 27, categoria: 'monitores', imagen: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&q=80', nombre: 'Alienware AW2524H 24"', desc: 'Velocidad absurda de 500Hz para los gamers más exigentes.', precio: 649.99 },
+            { id: 28, categoria: 'monitores', imagen: 'https://images.unsplash.com/photo-1585776245991-cf89dd7fc73a?w=400&q=80', nombre: 'Acer Predator XB3', desc: 'Imágenes perfectas IPS en resolución 4K y 144Hz nativos.', precio: 599.99 },
+            { id: 29, categoria: 'monitores', imagen: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80', nombre: 'AOC Gaming 24G2', desc: 'Excelente opción económica de 144Hz panel IPS plano.', precio: 169.99 },
+            { id: 30, categoria: 'monitores', imagen: 'https://images.unsplash.com/photo-1616440347437-b1c73416efc2?w=400&q=80', nombre: 'Corsair XENEON Flex 45"', desc: 'Pantalla OLED gigante que puedes curvar manualmente.', precio: 1499.99 }
+        ];
+
+        let carrito = JSON.parse(localStorage.getItem('carrito_gamer')) || [];
+
+        function renderProductos() {
+            const grids = {
+                teclados: document.getElementById('teclados-grid'),
+                ratones: document.getElementById('ratones-grid'),
+                monitores: document.getElementById('monitores-grid')
+            };
+
+            Object.values(grids).forEach(g => g.innerHTML = '');
+
+            productos.forEach(prod => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <img class="product-img" src="${prod.imagen}" alt="${prod.nombre}" loading="lazy">
+                    <div class="product-info">
+                        <h3 class="product-title">${prod.nombre}</h3>
+                        <p class="product-desc">${prod.desc}</p>
+                        <div class="product-footer">
+                            <span class="product-price">$${prod.precio.toFixed(2)}</span>
+                            <button class="btn-add" onclick="agregarAlCarrito(${prod.id})">Agregar</button>
+                        </div>
+                    </div>
+                `;
+                grids[prod.categoria].appendChild(card);
+            });
+        }
+
+        function agregarAlCarrito(id) {
+            const productoSeleccionado = productos.find(p => p.id === id);
+            const existe = carrito.find(item => item.id === id);
+            
+            if (existe) {
+                existe.cantidad += 1;
+            } else {
+                carrito.push({ ...productoSeleccionado, cantidad: 1 });
+            }
+            actualizarCarrito();
+        }
+
+        function eliminarDelCarrito(id) {
+            carrito = carrito.filter(item => item.id !== id);
+            actualizarCarrito();
+        }
+
+        function actualizarCarrito() {
+            localStorage.setItem('carrito_gamer', JSON.stringify(carrito));
+            
+            const totalItems = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+            document.getElementById('cart-count').innerText = totalItems;
+
+            const container = document.getElementById('cart-items-container');
+            container.innerHTML = '';
+
+            let precioTotal = 0;
+
+            if (carrito.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#a0aec0;">El carrito está vacío.</p>';
+            } else {
+                carrito.forEach(item => {
+                    precioTotal += item.precio * item.cantidad;
+                    const itemRow = document.createElement('div');
+                    itemRow.className = 'cart-item';
+                    itemRow.innerHTML = `
+                        <div>
+                            <strong>${item.nombre}</strong> (x${item.cantidad})<br>
+                            <span style="color: var(--accent-color); font-size:14px;">$${(item.precio * item.cantidad).toFixed(2)}</span>
+                        </div>
+                        <button class="btn-remove" onclick="eliminarDelCarrito(${item.id})">Quitar</button>
+                    `;
+                    container.appendChild(itemRow);
+                });
+            }
+            document.getElementById('cart-total-price').innerText = precioTotal.toFixed(2);
+        }
+
+        function toggleCart() {
+            const modal = document.getElementById('cart-modal');
+            modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        // FUNCIÓN PRINCIPAL CON NOTIFICACIÓN DE COMPRA POR TELEGRAM
+        function procesarCompra() {
+            if (carrito.length === 0) {
+                alert("Tu carrito está vacío.");
+                return;
+            }
+
+            // REEMPLAZA ESTOS VALORES CON TUS CREDENCIALES REALES
+            const TELEGRAM_TOKEN = 'TU_TOKEN_DE_BOT_AQUÍ'; 
+            const CHAT_ID = 'TU_CHAT_ID_AQUÍ';
+
+            let mensaje = "🖥️ *¡NUEVA ORDEN GAMER RECIBIDA!* 🖥️\n\n";
+            let total = 0;
+
+            carrito.forEach(item => {
+                const subtotal = item.precio * item.cantidad;
+                total += subtotal;
+                mensaje += `• ${item.nombre} (x${item.cantidad}) - $${subtotal.toFixed(2)}\n`;
+            });
+
+            mensaje += `\n💰 *Total de la Venta:* $${total.toFixed(2)}`;
+
+            fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: mensaje,
+                    parse_mode: 'Markdown'
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("¡Pedido completado! Se ha enviado la lista de hardware al administrador.");
+                    carrito = [];
+                    actualizarCarrito();
+                    toggleCart();
+                } else {
+                    alert("Error al enviar la orden por Telegram. Revisa el Token y Chat ID.");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Error de conexión al procesar el pago.");
+            });
+        }
+
+        renderProductos();
+        actualizarCarrito();
+    </script>
+</body>
+</html>
